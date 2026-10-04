@@ -9,23 +9,25 @@ const INDIA_DATA = [
 
 const RANKINGS = {
   2026: [
-    ["Finland",7.764],["Iceland",7.540],["Denmark",7.539],["Costa Rica",7.439],
-    ["Sweden",7.255],["Norway",7.242],["Netherlands",7.223],["Israel",7.187],
-    ["Luxembourg",7.063],["Switzerland",7.018],["New Zealand",6.995],
-    ["Mexico",6.974],["Australia",6.916],["Ireland",6.828],["Germany",6.882],
-    ["India",4.536]
+    ["Finland",7.764,1],["Iceland",7.540,2],["Denmark",7.539,3],["Costa Rica",7.439,4],
+    ["Sweden",7.255,5],["Norway",7.242,6],["Netherlands",7.223,7],["Israel",7.187,8],
+    ["Luxembourg",7.063,9],["Switzerland",7.018,10],["New Zealand",6.995,11],
+    ["Mexico",6.974,12],["Australia",6.916,15],["Ireland",6.828,13],
+    ["Germany",6.882,14],["India",4.536,116]
   ],
   2025: [
-    ["Finland",7.736],["Denmark",7.521],["Iceland",7.515],["Sweden",7.345],
-    ["Netherlands",6.955],["Costa Rica",6.979],["Norway",7.262],["Israel",7.187],
-    ["Luxembourg",7.122],["Mexico",6.979],["Australia",6.974],["New Zealand",6.952],
-    ["Switzerland",6.935],["Ireland",6.889],["Germany",6.882],["India",4.389]
+    ["Finland",7.736,1],["Denmark",7.521,2],["Iceland",7.515,3],["Sweden",7.345,4],
+    ["Netherlands",6.955,5],["Costa Rica",6.979,6],["Norway",7.262,7],["Israel",7.187,8],
+    ["Luxembourg",7.122,9],["Mexico",6.979,10],["Australia",6.974,11],
+    ["New Zealand",6.952,12],["Switzerland",6.935,13],["Ireland",6.889,14],
+    ["Germany",6.882,15],["India",4.389,118]
   ],
   2024: [
-    ["Finland",7.741],["Denmark",7.583],["Iceland",7.525],["Sweden",7.344],
-    ["Israel",7.341],["Netherlands",7.319],["Norway",7.302],["Luxembourg",7.122],
-    ["Switzerland",7.060],["Australia",7.057],["New Zealand",7.029],["Costa Rica",6.955],
-    ["Kuwait",6.951],["Austria",6.905],["Canada",6.900],["India",4.054]
+    ["Finland",7.741,1],["Denmark",7.583,2],["Iceland",7.525,3],["Sweden",7.344,4],
+    ["Israel",7.341,5],["Netherlands",7.319,6],["Norway",7.302,7],["Luxembourg",7.122,8],
+    ["Switzerland",7.060,9],["Australia",7.057,10],["New Zealand",7.029,11],
+    ["Costa Rica",6.955,12],["Kuwait",6.951,13],["Austria",6.905,14],
+    ["Canada",6.900,15],["India",4.054,126]
   ]
 };
 
@@ -60,7 +62,7 @@ function renderRankings(year = "2026"){
   const india = INDIA_DATA.find(x => x.year === String(year));
 
   let data = rows.map((item,index) => ({
-    rank: index + 1,
+    rank: item[2] ?? (index + 1),
     country: item[0],
     score: item[1]
   }));
