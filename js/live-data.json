@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T17:45:23.517259+00:00",
+  "generatedAt": "2026-10-04T17:48:32.625949+00:00",
   "autoUpdatedIndexes": {
     "hdi": {
       "id": "hdi",
@@ -11,8 +11,6 @@
     "cyber": {
       "id": "cyber",
       "latestYear": 2024,
-      "indiaRank": 0,
-      "total": 0,
       "source": "https://www.itu.int/en/ITU-D/Cybersecurity/Pages/global-cybersecurity-index.aspx",
       "sourceFile": "https://www.itu.int/en/ITU-D/Cybersecurity/Pages/global-cybersecurity-index.aspx",
       "releaseStatus": "released"
@@ -43,11 +41,7 @@
     },
     {
       "source": "latest_epi",
-      "error": "India EPI result not found"
-    },
-    {
-      "source": "latest_wgi",
-      "error": "list index out of range"
+      "error": "Excel file format cannot be determined, you must specify an engine manually."
     },
     {
       "source": "latest_world_bank_human",
