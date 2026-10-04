@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T17:48:32.625949+00:00",
+  "generatedAt": "2026-10-04T17:54:34.690037+00:00",
   "autoUpdatedIndexes": {
     "hdi": {
       "id": "hdi",
@@ -41,7 +41,7 @@
     },
     {
       "source": "latest_epi",
-      "error": "Excel file format cannot be determined, you must specify an engine manually."
+      "error": "India EPI rank not found on official page"
     },
     {
       "source": "latest_world_bank_human",
@@ -82,10 +82,6 @@
     {
       "source": "latest_network_readiness",
       "error": "India Network Readiness rank not found"
-    },
-    {
-      "source": "latest_imf_gdp",
-      "error": "IMF ISO column not found"
     }
   ],
   "note": "Only verified machine-readable official sources are overridden here. js/data.js remains the fallback for indexes without a supported automatic adapter yet."
