@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Global Index Tracker 🌍</title>
+  <meta name="description" content="Track all major global indexes and India's world ranking — HDI, GDP, Press Freedom, Corruption & 20+ more."/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <!-- Firebase -->
+  <script type="module" src="js/firebase-config.js"></script>
+</head>
+<body>
+
+<!-- SPLASH LOADER -->
+<div id="splash">
+  <div class="splash-inner">
+    <div class="globe-anim">🌍</div>
+    <h2>Global Index Tracker</h2>
+    <p>Loading world data...</p>
+    <div class="splash-bar"><div class="splash-fill" id="splashFill"></div></div>
+  </div>
+</div>
+
+<!-- APP WRAPPER -->
+<div id="app" class="app-hidden">
+
+  <!-- ── TOP NAV ── -->
+  <nav class="topnav">
+    <div class="nav-left">
+      <span class="nav-logo">🌍</span>
+      <span class="nav-title">IndexTracker</span>
+    </div>
+    <div class="nav-right">
+      <button class="icon-btn" onclick="openAddModal()" title="Add Index">
+        <i class="fas fa-plus"></i>
+      </button>
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Theme">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── INDIA HERO CARD ── -->
+  <section class="india-hero">
+    <div class="india-flag-row">
+      <span class="flag">🇮🇳</span>
+      <div>
+        <h1>India's Global Standing</h1>
+        <p class="hero-sub">Live rankings across all major world indexes</p>
+      </div>
+    </div>
+    <div class="india-stats-row" id="indiaStats">
+      <!-- filled by JS -->
+    </div>
+  </section>
+
+  <!-- ── SEARCH + FILTER ── -->
+  <div class="controls">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search index... (e.g. HDI, GDP)" oninput="filterIndexes()"/>
+    </div>
+    <div class="filter-chips" id="filterChips">
+      <button class="chip active" onclick="filterByCategory('all', this)">All</button>
+      <button class="chip" onclick="filterByCategory('economy', this)">💰 Economy</button>
+      <button class="chip" onclick="filterByCategory('human', this)">👤 Human Dev</button>
+      <button class="chip" onclick="filterByCategory('governance', this)">🏛️ Governance</button>
+      <button class="chip" onclick="filterByCategory('environment', this)">🌱 Environment</button>
+      <button class="chip" onclick="filterByCategory('tech', this)">💻 Technology</button>
+      <button class="chip" onclick="filterByCategory('health', this)">🏥 Health</button>
+    </div>
+  </div>
+
+  <!-- ── INDEX CARDS GRID ── -->
+  <div class="cards-section">
+    <div class="section-title-row">
+      <h2>All Indexes</h2>
+      <span class="count-badge" id="countBadge">0 indexes</span>
+    </div>
+    <div class="cards-grid" id="cardsGrid">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <!-- ── TREND CHART SECTION ── -->
+  <div class="chart-section">
+    <div class="chart-header">
+      <h2>📈 India Rank Trend</h2>
+      <select id="chartIndexSelect" onchange="updateChart()">
+        <!-- filled by JS -->
+      </select>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="trendChart"></canvas>
+    </div>
+    <p class="chart-note">* Lower rank = Better position (Rank 1 = Best in world)</p>
+  </div>
+
+  <!-- ── LAST UPDATED ── -->
+  <div class="last-updated" id="lastUpdated">Last updated: —</div>
+
+</div><!-- end #app -->
+
+<!-- ══════════ INDEX DETAIL MODAL ══════════ -->
+<div class="modal-overlay" id="detailModal" onclick="closeDetailModal(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('detailModal')">✕</button>
+    <div class="modal-emoji" id="modalEmoji">📊</div>
+    <h2 id="modalTitle">Index Name</h2>
+    <p id="modalOrg" class="modal-org">by Organization</p>
+    <div class="modal-rank-row">
+      <div class="modal-rank-card rank-india">
+        <span class="rank-label">🇮🇳 India Rank</span>
+        <span class="rank-num" id="modalIndiaRank">—</span>
+        <span class="rank-out" id="modalOutOf">out of —</span>
+      </div>
+      <div class="modal-rank-card rank-world">
+        <span class="rank-label">🏆 #1 Country</span>
+        <span class="rank-num" id="modalTop">—</span>
+      </div>
+    </div>
+    <div class="modal-trend-row">
+      <span class="trend-label">Trend vs Last Year</span>
+      <span class="trend-badge" id="modalTrend">—</span>
+    </div>
+    <p class="modal-desc" id="modalDesc">Description here.</p>
+    <div class="modal-history">
+      <h4>India's Rank History</h4>
+      <div class="history-list" id="modalHistory">—</div>
+    </div>
+    <a href="#" id="modalSource" target="_blank" class="modal-link">
+      <i class="fas fa-external-link-alt"></i> View Official Source
+    </a>
+  </div>
+</div>
+
+<!-- ══════════ ADD INDEX MODAL ══════════ -->
+<div class="modal-overlay" id="addModal" onclick="closeDetailModal(event)">
+  <div class="modal-box add-modal-box">
+    <button class="modal-close" onclick="closeModal('addModal')">✕</button>
+    <h2>➕ Add New Index</h2>
+    <p class="add-sub">Track a new global index not listed yet</p>
+    <form id="addForm" onsubmit="submitNewIndex(event)">
+      <div class="form-group">
+        <label>Index Name *</label>
+        <input type="text" id="newName" placeholder="e.g. Global Peace Index" required/>
+      </div>
+      <div class="form-group">
+        <label>Emoji Icon</label>
+        <input type="text" id="newEmoji" placeholder="e.g. ☮️" maxlength="4"/>
+      </div>
+      <div class="form-group">
+        <label>Published By *</label>
+        <input type="text" id="newOrg" placeholder="e.g. Institute for Economics & Peace" required/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>India Rank *</label>
+          <input type="number" id="newIndiaRank" placeholder="e.g. 116" min="1" required/>
+        </div>
+        <div class="form-group">
+          <label>Total Countries *</label>
+          <input type="number" id="newTotal" placeholder="e.g. 163" min="1" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="newCategory">
+          <option value="economy">💰 Economy</option>
+          <option value="human">👤 Human Development</option>
+          <option value="governance">🏛️ Governance</option>
+          <option value="environment">🌱 Environment</option>
+          <option value="tech">💻 Technology</option>
+          <option value="health">🏥 Health</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Country Ranked #1</label>
+        <input type="text" id="newTop" placeholder="e.g. Iceland"/>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="newDesc" rows="3" placeholder="Brief description of what this index measures..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Trend vs Last Year</label>
+        <select id="newTrend">
+          <option value="up">📈 Improved (rank went up)</option>
+          <option value="down">📉 Declined (rank went down)</option>
+          <option value="same">➡️ Same as last year</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Official Source URL</label>
+        <input type="url" id="newSource" placeholder="https://..."/>
+      </div>
+      <button type="submit" class="submit-btn">
+        <i class="fas fa-plus"></i> Add Index
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
