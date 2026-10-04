@@ -163,6 +163,12 @@ def latest_epi():
     }
 
 
+def world_bank_rows(payload):
+    if not isinstance(payload, list) or len(payload) < 2 or not isinstance(payload[1], list):
+        raise ValueError("Unexpected World Bank API response")
+    return [r for r in payload[1] if isinstance(r, dict) and r.get("value") is not None and r.get("countryiso3code")]
+
+
 def latest_world_bank_human():
     # World Bank WDI indicators used by the existing Human/Health cards.
     # Each series is ranked by the latest year for which India and comparable
@@ -175,7 +181,7 @@ def latest_world_bank_human():
     for indicator, index_id, source in specs:
         url = f"https://api.worldbank.org/v2/country/all/indicator/{indicator}?format=json&per_page=20000"
         payload = get(url).json()
-        rows = [r for r in payload[1] if r.get("value") is not None and r.get("countryiso3code")]
+        rows = world_bank_rows(payload)
         if not rows:
             continue
         year = max(int(r["date"]) for r in rows)
@@ -252,8 +258,6 @@ def latest_itu_cyber():
     return {
         "id": "cyber",
         "latestYear": 2024,
-        "indiaRank": 0,
-        "total": 0,
         "source": "https://www.itu.int/en/ITU-D/Cybersecurity/Pages/global-cybersecurity-index.aspx",
         "sourceFile": url,
         "releaseStatus": "released"
@@ -451,7 +455,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
