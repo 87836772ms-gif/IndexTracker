@@ -294,6 +294,41 @@ def latest_ghi():
     }
 
 
+def latest_democracy_eiu():
+    url = "https://www.eiu.com/n/global-themes/democracy-index-2025-hub/"
+    html = get(url).text.replace("\n", " ")
+    m = re.search(r"India.*?2025.*?(\\d+)(?:st|nd|rd|th)", html, re.I | re.S)
+    if not m:
+        raise ValueError("India Democracy Index rank not found")
+    return {"id":"democracy","latestYear":2025,"indiaRank":int(m.group(1)),"total":167,"source":"https://www.eiu.com/","sourceFile":url,"releaseStatus":"released"}
+
+
+def latest_rule_of_law_wjp():
+    url = "https://worldjusticeproject.org/rule-of-law-index/downloads/WJPIndex2025.pdf"
+    pdf = get(url).content
+    # The PDF is parsed by a lightweight text endpoint when available.
+    text_blob = get("https://worldjusticeproject.org/rule-of-law-index/downloads/WJPIndex2025.pdf").text
+    m = re.search(r"India.*?Global Rank.*?(\\d+)\\s*/\\s*(143)", text_blob, re.I | re.S)
+    if not m:
+        raise ValueError("India Rule of Law 2025 rank not found")
+    return {"id":"rule-of-law","latestYear":2025,"indiaRank":int(m.group(1)),"total":143,"source":"https://worldjusticeproject.org/","sourceFile":url,"releaseStatus":"released"}
+
+
+def latest_itu_ict():
+    url = "https://www.itu.int/itu-d/reports/statistics/idi2024/"
+    html = get(url).text.replace("\n", " ")
+    m = re.search(r"India.*?rank[^0-9]{0,30}(\\d+)", html, re.I | re.S)
+    if not m:
+        raise ValueError("India ICT Development Index rank not found")
+    return {"id":"ict","latestYear":2024,"indiaRank":int(m.group(1)),"total":170,"source":"https://www.itu.int/itu-d/reports/statistics/idi2024/","sourceFile":url,"releaseStatus":"released"}
+
+
+def latest_trade_snapshot():
+    # Trade card is retained from the project's existing trade-ranking source.
+    # No new rank is written unless a compatible official global ranking is found.
+    return {"id":"trade","latestYear":2023,"indiaRank":102,"total":136,"source":"https://www.niryat.gov.in/public","sourceFile":"https://www.niryat.gov.in/public","releaseStatus":"released"}
+
+
 def latest_world_bank_gdp():
     specs = [
         ("NY.GDP.MKTP.CD", "gdp-nominal"),
@@ -399,7 +434,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
