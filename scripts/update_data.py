@@ -163,6 +163,41 @@ def latest_epi():
     }
 
 
+def latest_world_bank_human():
+    # World Bank WDI indicators used by the existing Human/Health cards.
+    # Each series is ranked by the latest year for which India and comparable
+    # country values are available.
+    specs = [
+        ("SP.DYN.LE00.IN", "life-expectancy", "https://data.worldbank.org/indicator/SP.DYN.LE00.IN"),
+        ("SH.DYN.NMRT", "maternal-mortality", "https://data.worldbank.org/indicator/SH.DYN.NMRT"),
+    ]
+    out = []
+    for indicator, index_id, source in specs:
+        url = f"https://api.worldbank.org/v2/country/all/indicator/{indicator}?format=json&per_page=20000"
+        payload = get(url).json()
+        rows = [r for r in payload[1] if r.get("value") is not None and r.get("countryiso3code")]
+        if not rows:
+            continue
+        year = max(int(r["date"]) for r in rows)
+        latest = [r for r in rows if int(r["date"]) == year]
+        # Higher life expectancy is better; lower maternal mortality is better.
+        reverse = indicator != "SH.DYN.NMRT"
+        latest.sort(key=lambda r: float(r["value"]), reverse=reverse)
+        india = next((r for r in latest if r["countryiso3code"] == "IND"), None)
+        if india is None:
+            continue
+        out.append({
+            "id": index_id,
+            "latestYear": year,
+            "indiaRank": latest.index(india) + 1,
+            "total": len(latest),
+            "source": "https://data.worldbank.org/",
+            "sourceFile": url,
+            "releaseStatus": "released",
+        })
+    return out
+
+
 def latest_wgi():
     # World Bank WGI API: use Control of Corruption as the closest
     # official governance series represented by the existing CPI card.
@@ -238,7 +273,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
