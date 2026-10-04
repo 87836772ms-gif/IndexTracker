@@ -163,6 +163,31 @@ def latest_epi():
     }
 
 
+def latest_wgi():
+    # World Bank WGI API: use Control of Corruption as the closest
+    # official governance series represented by the existing CPI card.
+    url = "https://api.worldbank.org/v2/country/all/indicator/CC.EST?format=json&per_page=20000"
+    payload = get(url).json()
+    rows = [r for r in payload[1] if r.get("value") is not None and r.get("countryiso3code")]
+    if not rows:
+        raise ValueError("No WGI corruption-control values returned")
+    year = max(int(r["date"]) for r in rows)
+    latest = [r for r in rows if int(r["date"]) == year]
+    latest.sort(key=lambda r: float(r["value"]), reverse=True)
+    india = next((r for r in latest if r["countryiso3code"] == "IND"), None)
+    if india is None:
+        raise ValueError("India missing from WGI data")
+    return {
+        "id": "cpi",
+        "latestYear": year,
+        "indiaRank": latest.index(india) + 1,
+        "total": len(latest),
+        "source": "https://www.worldbank.org/en/publication/worldwide-governance-indicators",
+        "sourceFile": url,
+        "releaseStatus": "released",
+    }
+
+
 def latest_imf_gdp():
     page = "https://data.imf.org/Datasets/WEO"
     urls = links(page, r"\.xlsx$")
@@ -213,7 +238,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
