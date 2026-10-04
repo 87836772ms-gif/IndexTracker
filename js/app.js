@@ -128,6 +128,10 @@ function renderCards(indexes) {
 }
 
 function createCard(idx) {
+  const dedicatedPages = { happiness: 'happiness.html' };
+  const cardAction = dedicatedPages[idx.id]
+    ? `window.location.href='\${dedicatedPages[idx.id]}'`
+    : `openDetailModal('\${idx.id}')`;
   const pct = Math.round((1 - idx.indiaRank / idx.total) * 100);
   const barW = Math.max(4, pct);
 
@@ -148,7 +152,7 @@ function createCard(idx) {
   }[idx.category] || idx.category;
 
   return `
-    <div class="index-card" style="--card-color:${idx.color};border-left:3px solid ${rankColor}" onclick="openDetailModal('${idx.id}')">
+    <div class="index-card" style="--card-color:${idx.color};border-left:3px solid ${rankColor}" onclick="${cardAction}">
       <div class="card-top">
         <span class="card-emoji">${idx.emoji}</span>
         <span class="card-category">${categoryLabel}</span>
