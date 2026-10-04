@@ -130,8 +130,8 @@ function renderCards(indexes) {
 function createCard(idx) {
   const dedicatedPages = { happiness: 'happiness.html' };
   const cardAction = dedicatedPages[idx.id]
-    ? `window.location.href='\${dedicatedPages[idx.id]}'`
-    : `openDetailModal('\${idx.id}')`;
+    ? `window.location.href='${dedicatedPages[idx.id]}'`
+    : `openDetailModal('${idx.id}')`;
   const pct = Math.round((1 - idx.indiaRank / idx.total) * 100);
   const barW = Math.max(4, pct);
 
