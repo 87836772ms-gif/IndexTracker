@@ -245,6 +245,55 @@ def latest_global_indexes():
     return out
 
 
+def latest_itu_cyber():
+    # ITU GCI 2024 is the current published edition; GCI 6 data collection
+    # has not started yet, so do not invent a 2026 rank.
+    url = "https://www.itu.int/en/ITU-D/Cybersecurity/Pages/global-cybersecurity-index.aspx"
+    return {
+        "id": "cyber",
+        "latestYear": 2024,
+        "indiaRank": 0,
+        "total": 0,
+        "source": "https://www.itu.int/en/ITU-D/Cybersecurity/Pages/global-cybersecurity-index.aspx",
+        "sourceFile": url,
+        "releaseStatus": "released"
+    }
+
+
+def latest_rsf_press():
+    url = "https://rsf.org/en/country/india"
+    html = get(url).text.replace("\n", " ")
+    m = re.search(r"Index 2026.*?(\\d+)\\s*/\\s*180", html, re.I | re.S)
+    if not m:
+        raise ValueError("RSF India 2026 rank not found")
+    return {
+        "id": "press-freedom",
+        "latestYear": 2026,
+        "indiaRank": int(m.group(1)),
+        "total": 180,
+        "source": "https://rsf.org/en",
+        "sourceFile": url,
+        "releaseStatus": "released"
+    }
+
+
+def latest_ghi():
+    url = "https://www.globalhungerindex.org/india.html"
+    html = get(url).text.replace("\n", " ")
+    m = re.search(r"2025 GHI.*?ranked\\s+(\\d+)(?:st|nd|rd|th)\\s+out\\s+of\\s+(\\d+)\\s+countries", html, re.I | re.S)
+    if not m:
+        raise ValueError("India GHI 2025 rank not found")
+    return {
+        "id": "hunger",
+        "latestYear": 2025,
+        "indiaRank": int(m.group(1)),
+        "total": int(m.group(2)),
+        "source": "https://www.globalhungerindex.org/",
+        "sourceFile": url,
+        "releaseStatus": "released"
+    }
+
+
 def latest_world_bank_gdp():
     specs = [
         ("NY.GDP.MKTP.CD", "gdp-nominal"),
@@ -350,7 +399,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
