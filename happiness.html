@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="India's World Happiness Report profile — score, rank, measurement method and six explanatory factors.">
+  <title>World Happiness Report | IndexTracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/happiness.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="index.html"><span>🌍</span> IndexTracker</a>
+      <div class="top-actions">
+        <a class="back-link" href="index.html">← All Indexes</a>
+        <button class="theme-btn" id="themeToggle" aria-label="Toggle dark mode">☾</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">WORLD HAPPINESS REPORT · 2026</p>
+          <h1>WORLD<br>HAPPINESS REPORT</h1>
+          <p class="hero-text">How people evaluate the quality of their lives — and where India stands in the global picture.</p>
+          <div class="hero-meta">
+            <span>Latest available: 2026</span>
+            <span>Ranking period: 2023–2025</span>
+          </div>
+        </div>
+        <div class="hero-visual" aria-label="Global happiness illustration">
+          <div class="glow"></div>
+          <div class="world-orbit orbit-one"></div>
+          <div class="world-orbit orbit-two"></div>
+          <div class="globe"><div class="continent c1"></div><div class="continent c2"></div><div class="continent c3"></div></div>
+          <div class="people">
+            <span>●</span><span>●</span><span>●</span><span>●</span><span>●</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">INDIA · 2026</p>
+            <h2>India at a glance</h2>
+          </div>
+          <span class="source-pill">Latest available report</span>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card accent">
+            <span class="stat-label">India rank</span>
+            <strong id="indiaRank">116</strong><span class="stat-total">/ 147</span>
+            <p id="rankNote">Rank improved by 2 places from 2025.</p>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Life evaluation score</span>
+            <strong>4.536</strong><span class="stat-total">/ 10</span>
+            <p>Three-year average for 2023–2025.</p>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Top country</span>
+            <strong>Finland</strong>
+            <p>Finland has topped the ranking since 2018.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section method-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">HOW IT IS MEASURED</p>
+            <h2>The Cantril Ladder</h2>
+          </div>
+          <a class="source-link" href="https://www.worldhappiness.report/faq/" target="_blank" rel="noopener">World Happiness Report ↗</a>
+        </div>
+        <div class="method-card">
+          <div class="ladder">
+            <div class="ladder-top">10 · Best possible life</div>
+            <div class="ladder-line"><span></span></div>
+            <div class="ladder-line"><span></span></div>
+            <div class="ladder-line"><span></span></div>
+            <div class="ladder-line"><span></span></div>
+            <div class="ladder-line"><span></span></div>
+            <div class="ladder-line"><span></span></div>
+            <div class="ladder-line"><span></span></div>
+            <div class="ladder-line"><span></span></div>
+            <div class="ladder-line"><span></span></div>
+            <div class="ladder-bottom">0 · Worst possible life</div>
+          </div>
+          <div class="method-copy">
+            <h3>People evaluate their own lives on a 0–10 scale.</h3>
+            <p>The World Happiness Report asks respondents to imagine a ladder from 0 to 10. The bottom represents the worst possible life for them; the top represents the best possible life. Countries are ranked by the average of these self-assessments.</p>
+            <p class="important-note"><strong>Important:</strong> the six factors below do <em>not</em> get added together to create the ranking. They are used to explain differences in life evaluations.</p>
+            <div class="factor-grid">
+              <div><b>01</b><span>GDP per capita</span></div>
+              <div><b>02</b><span>Social support</span></div>
+              <div><b>03</b><span>Healthy life expectancy</span></div>
+              <div><b>04</b><span>Freedom to make life choices</span></div>
+              <div><b>05</b><span>Generosity</span></div>
+              <div><b>06</b><span>Perceptions of corruption</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">INDIA · SIX REPORTS</p>
+            <h2>India's happiness trend</h2>
+          </div>
+          <div class="trend-status" id="trendStatus">Strongly improved</div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <span class="chart-title">Average life evaluation</span>
+              <span class="chart-subtitle">0–10 Cantril Ladder score</span>
+            </div>
+            <span class="latest-badge">2026 latest</span>
+          </div>
+          <div class="chart-wrap"><canvas id="indiaChart"></canvas></div>
+          <p class="chart-note">Each point is the reported India score for that edition. Higher score means a higher average life evaluation; rank is shown below.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">INDIA · REPORT HISTORY</p>
+            <h2>Score and rank</h2>
+          </div>
+        </div>
+        <div class="table-card">
+          <div class="table-row table-head"><span>Report</span><span>Score</span><span>Rank</span><span>Trend</span></div>
+          <div class="table-row"><span>2026</span><strong>4.536</strong><span>116 / 147</span><em class="positive">Strongly improved</em></div>
+          <div class="table-row"><span>2025</span><strong>4.389</strong><span>118 / 147</span><em class="positive">Moderately improved</em></div>
+          <div class="table-row"><span>2024</span><strong>4.054</strong><span>126 / 143</span><em class="positive">Moderately improved</em></div>
+          <div class="table-row"><span>2023</span><strong>4.036</strong><span>126 / 137</span><em>Stable</em></div>
+          <div class="table-row"><span>2022</span><strong>3.777</strong><span>136 / 146</span><em class="positive">Moderately improved</em></div>
+          <div class="table-row"><span>2021</span><strong>3.819</strong><span>139 / 149</span><em class="neutral">Moderately declined</em></div>
+        </div>
+      </section>
+
+      <section class="section last-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">SOURCES & RELEASE STATUS</p>
+            <h2>Official references</h2>
+          </div>
+        </div>
+        <div class="source-grid">
+          <a class="source-card" href="https://www.worldhappiness.report/" target="_blank" rel="noopener"><span>World Happiness Report</span><small>Official report and country rankings ↗</small></a>
+          <a class="source-card" href="https://www.worldhappiness.report/data-sharing/" target="_blank" rel="noopener"><span>Data Sharing</span><small>Figure 2.1 data and explanatory factors ↗</small></a>
+          <a class="source-card" href="https://files.worldhappiness.report/WHR26_Statistical_Appendix.pdf" target="_blank" rel="noopener"><span>2026 Statistical Appendix</span><small>India's 2026 score and rank ↗</small></a>
+        </div>
+        <p class="release-note"><strong>Latest available year:</strong> 2026. The report is published annually, but the ranking uses a three-year average of life evaluations rather than a single-year survey score.</p>
+      </section>
+    </main>
+
+    <footer>IndexTracker · World Happiness Report profile · Data shown from official report sources</footer>
+  </div>
+  <script src="js/happiness.js"></script>
+</body>
+</html>
