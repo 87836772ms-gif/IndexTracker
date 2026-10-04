@@ -198,6 +198,36 @@ def latest_world_bank_human():
     return out
 
 
+def latest_world_bank_gdp():
+    specs = [
+        ("NY.GDP.MKTP.CD", "gdp-nominal"),
+        ("NY.GDP.MKTP.PP.CD", "gdp-ppp"),
+    ]
+    out = []
+    for indicator, index_id in specs:
+        url = f"https://api.worldbank.org/v2/country/all/indicator/{indicator}?format=json&per_page=20000"
+        payload = get(url).json()
+        rows = [r for r in payload[1] if r.get("value") is not None and r.get("countryiso3code")]
+        if not rows:
+            continue
+        year = max(int(r["date"]) for r in rows)
+        latest = [r for r in rows if int(r["date"]) == year]
+        latest.sort(key=lambda r: float(r["value"]), reverse=True)
+        india = next((r for r in latest if r["countryiso3code"] == "IND"), None)
+        if india is None:
+            continue
+        out.append({
+            "id": index_id,
+            "latestYear": year,
+            "indiaRank": latest.index(india) + 1,
+            "total": len(latest),
+            "source": "https://data.worldbank.org/",
+            "sourceFile": url,
+            "releaseStatus": "released",
+        })
+    return out
+
+
 def latest_wgi():
     # World Bank WGI API: use Control of Corruption as the closest
     # official governance series represented by the existing CPI card.
@@ -273,7 +303,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_world_bank_gdp, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
