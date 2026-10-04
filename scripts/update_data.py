@@ -198,6 +198,24 @@ def latest_world_bank_human():
     return out
 
 
+def latest_technology_wipo():
+    # WIPO Global Innovation Index: prefer the official country profile page.
+    url = "https://www.wipo.int/gii-ranking/en/india"
+    html = get(url).text.replace("\n", " ")
+    m = re.search(r"India.*?rank[^0-9]{0,30}(\d+)", html, re.I)
+    if not m:
+        raise ValueError("India GII rank not found")
+    return {
+        "id": "gii",
+        "latestYear": 2025,
+        "indiaRank": int(m.group(1)),
+        "total": 139,
+        "source": "https://www.wipo.int/global_innovation_index/",
+        "sourceFile": url,
+        "releaseStatus": "released",
+    }
+
+
 def latest_world_bank_gdp():
     specs = [
         ("NY.GDP.MKTP.CD", "gdp-nominal"),
@@ -303,7 +321,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_world_bank_gdp, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
