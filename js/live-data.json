@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-10-04T00:00:00Z",
+  "autoUpdatedIndexes": {
+    "hdi": {
+      "id": "hdi",
+      "latestYear": 2025,
+      "indiaRank": 130,
+      "total": 193,
+      "topCountry": "Iceland",
+      "source": "https://hdr.undp.org/"
+    },
+    "happiness": {
+      "id": "happiness",
+      "latestYear": 2026,
+      "indiaRank": 116,
+      "total": 147,
+      "topCountry": "Finland",
+      "source": "https://worldhappiness.report/"
+    }
+  },
+  "errors": [],
+  "note": "Generated fallback snapshot. GitHub Actions will refresh this file from supported official sources."
+}
