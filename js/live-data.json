@@ -1,23 +1,98 @@
 {
-  "generatedAt": "2026-10-04T00:00:00Z",
+  "generatedAt": "2026-10-04T17:45:23.517259+00:00",
   "autoUpdatedIndexes": {
     "hdi": {
       "id": "hdi",
       "latestYear": 2025,
       "indiaRank": 130,
-      "total": 193,
-      "topCountry": "Iceland",
-      "source": "https://hdr.undp.org/"
+      "source": "https://hdr.undp.org/",
+      "sourceFile": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Statistical_Annex_HDI_Table.xlsx"
     },
-    "happiness": {
-      "id": "happiness",
-      "latestYear": 2026,
-      "indiaRank": 116,
-      "total": 147,
-      "topCountry": "Finland",
-      "source": "https://worldhappiness.report/"
+    "cyber": {
+      "id": "cyber",
+      "latestYear": 2024,
+      "indiaRank": 0,
+      "total": 0,
+      "source": "https://www.itu.int/en/ITU-D/Cybersecurity/Pages/global-cybersecurity-index.aspx",
+      "sourceFile": "https://www.itu.int/en/ITU-D/Cybersecurity/Pages/global-cybersecurity-index.aspx",
+      "releaseStatus": "released"
+    },
+    "trade": {
+      "id": "trade",
+      "latestYear": 2023,
+      "indiaRank": 102,
+      "total": 136,
+      "source": "https://www.niryat.gov.in/public",
+      "sourceFile": "https://www.niryat.gov.in/public",
+      "releaseStatus": "released"
+    },
+    "gci": {
+      "id": "gci",
+      "latestYear": 2019,
+      "indiaRank": 68,
+      "total": 141,
+      "source": "https://www.weforum.org/publications/global-competitiveness-report-2019/",
+      "sourceFile": "https://www.weforum.org/publications/global-competitiveness-report-2019/",
+      "releaseStatus": "discontinued"
     }
   },
-  "errors": [],
-  "note": "Generated fallback snapshot. GitHub Actions will refresh this file from supported official sources."
+  "errors": [
+    {
+      "source": "latest_happiness",
+      "error": "403 Client Error: Forbidden for url: https://www.worldhappiness.report/data-sharing/"
+    },
+    {
+      "source": "latest_epi",
+      "error": "India EPI result not found"
+    },
+    {
+      "source": "latest_wgi",
+      "error": "list index out of range"
+    },
+    {
+      "source": "latest_world_bank_human",
+      "error": "list indices must be integers or slices, not str"
+    },
+    {
+      "source": "latest_world_bank_gdp",
+      "error": "list indices must be integers or slices, not str"
+    },
+    {
+      "source": "latest_technology_wipo",
+      "error": "India GII rank not found"
+    },
+    {
+      "source": "latest_global_indexes",
+      "error": "list indices must be integers or slices, not str"
+    },
+    {
+      "source": "latest_rsf_press",
+      "error": "RSF India 2026 rank not found"
+    },
+    {
+      "source": "latest_ghi",
+      "error": "India GHI 2025 rank not found"
+    },
+    {
+      "source": "latest_democracy_eiu",
+      "error": "India Democracy Index rank not found"
+    },
+    {
+      "source": "latest_rule_of_law_wjp",
+      "error": "India Rule of Law 2025 rank not found"
+    },
+    {
+      "source": "latest_itu_ict",
+      "error": "India ICT Development Index rank not found"
+    },
+    {
+      "source": "latest_network_readiness",
+      "error": "India Network Readiness rank not found"
+    },
+    {
+      "source": "latest_imf_gdp",
+      "error": "IMF ISO column not found"
+    }
+  ],
+  "note": "Only verified machine-readable official sources are overridden here. js/data.js remains the fallback for indexes without a supported automatic adapter yet."
 }
