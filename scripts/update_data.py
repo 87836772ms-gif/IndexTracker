@@ -147,29 +147,15 @@ def latest_happiness():
 
 
 def latest_epi():
-    url = "https://epi.yale.edu/downloads/epi2026results2026-07-07.xlsx"
-    raw = get(url).content
-    xls = pd.ExcelFile(BytesIO(raw))
-    for sheet in xls.sheet_names:
-        df = pd.read_excel(BytesIO(raw), sheet_name=sheet)
-        cols = {str(c).strip().lower(): c for c in df.columns}
-        country_col = next((cols[k] for k in cols if k in {"country", "country name", "countryname"}), None)
-        rank_col = next((cols[k] for k in cols if "rank" in k and "epi" in k), None)
-        if country_col is None or rank_col is None:
-            continue
-        row = df[df[country_col].astype(str).str.strip().eq("India")]
-        if not row.empty:
-            rank = int(float(row.iloc[0][rank_col]))
-            return {
-                "id": "epi",
-                "latestYear": 2026,
-                "indiaRank": rank,
-                "total": 180,
-                "source": "https://epi.yale.edu/",
-                "sourceFile": url,
-                "releaseStatus": "released",
-            }
-    raise ValueError("India EPI rank not found in official XLSX")
+    url = "https://epi.yale.edu/2026/results/country/IND"
+    html = get(url).text.replace("\n", " ")
+    m = re.search(r"Environmental Performance Index.*?(\d+)\s*\|", html, re.I | re.S)
+    if not m:
+        raise ValueError("India EPI rank not found on official page")
+    return {
+        "id": "epi", "latestYear": 2026, "indiaRank": int(m.group(1)), "total": 177,
+        "source": "https://epi.yale.edu/", "sourceFile": url, "releaseStatus": "released",
+    }
 
 
 def world_bank_rows(payload):
@@ -215,14 +201,14 @@ def latest_world_bank_human():
 
 def latest_technology_wipo():
     # WIPO Global Innovation Index: prefer the official country profile page.
-    url = "https://www.wipo.int/gii-ranking/en/india"
+    url = "https://www.wipo.int/web-publications-preview/global-innovation-index-2026/en/gii-2026-results.html"
     html = get(url).text.replace("\n", " ")
-    m = re.search(r"India.*?rank[^0-9]{0,30}(\d+)", html, re.I)
+    m = re.search(r"India\s*\((\d+)(?:st|nd|rd|th)\)", html, re.I)
     if not m:
         raise ValueError("India GII rank not found")
     return {
         "id": "gii",
-        "latestYear": 2025,
+        "latestYear": 2026,
         "indiaRank": int(m.group(1)),
         "total": 139,
         "source": "https://www.wipo.int/global_innovation_index/",
@@ -368,7 +354,7 @@ def latest_world_bank_gdp():
     for indicator, index_id in specs:
         url = f"https://api.worldbank.org/v2/country/all/indicator/{indicator}?format=json&per_page=20000"
         payload = get(url).json()
-        rows = [r for r in payload[1] if r.get("value") is not None and r.get("countryiso3code")]
+        rows = world_bank_rows(payload)
         if not rows:
             continue
         year = max(int(r["date"]) for r in rows)
@@ -464,7 +450,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness):
         try:
             item = fn()
             overrides[item["id"]] = item
