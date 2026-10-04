@@ -329,6 +329,23 @@ def latest_trade_snapshot():
     return {"id":"trade","latestYear":2023,"indiaRank":102,"total":136,"source":"https://www.niryat.gov.in/public","sourceFile":"https://www.niryat.gov.in/public","releaseStatus":"released"}
 
 
+def latest_network_readiness():
+    url = "https://www.networkreadinessindex.org/"
+    html = get(url).text.replace("\n", " ")
+    m = re.search(r"India.*?rank[^0-9]{0,30}(\\d+)", html, re.I | re.S)
+    if not m:
+        raise ValueError("India Network Readiness rank not found")
+    return {"id":"network-readiness","latestYear":2025,"indiaRank":int(m.group(1)),"total":127,"source":url,"sourceFile":url,"releaseStatus":"released"}
+
+
+def latest_global_competitiveness():
+    # WEF's GCI has no newer regular edition; preserve the last official edition.
+    return {"id":"gci","latestYear":2019,"indiaRank":68,"total":141,
+            "source":"https://www.weforum.org/publications/global-competitiveness-report-2019/",
+            "sourceFile":"https://www.weforum.org/publications/global-competitiveness-report-2019/",
+            "releaseStatus":"discontinued"}
+
+
 def latest_world_bank_gdp():
     specs = [
         ("NY.GDP.MKTP.CD", "gdp-nominal"),
@@ -434,7 +451,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_wgi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
