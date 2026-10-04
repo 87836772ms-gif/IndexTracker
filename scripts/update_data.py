@@ -147,20 +147,29 @@ def latest_happiness():
 
 
 def latest_epi():
-    url = "https://epi.yale.edu/2026/results/country/IND"
-    html = get(url).text.replace("\n", " ")
-    m = re.search(r"Environmental Performance Index\\s*\\|\\s*(\\d+)\\s*\\|\\s*([0-9.]+)", html, re.I)
-    if not m:
-        raise ValueError("India EPI result not found")
-    return {
-        "id": "epi",
-        "latestYear": 2026,
-        "indiaRank": int(m.group(1)),
-        "total": 177,
-        "source": "https://epi.yale.edu/",
-        "sourceFile": url,
-        "releaseStatus": "released",
-    }
+    url = "https://epi.yale.edu/downloads/epi2026results2026-07-07.xlsx"
+    raw = get(url).content
+    xls = pd.ExcelFile(BytesIO(raw))
+    for sheet in xls.sheet_names:
+        df = pd.read_excel(BytesIO(raw), sheet_name=sheet)
+        cols = {str(c).strip().lower(): c for c in df.columns}
+        country_col = next((cols[k] for k in cols if k in {"country", "country name", "countryname"}), None)
+        rank_col = next((cols[k] for k in cols if "rank" in k and "epi" in k), None)
+        if country_col is None or rank_col is None:
+            continue
+        row = df[df[country_col].astype(str).str.strip().eq("India")]
+        if not row.empty:
+            rank = int(float(row.iloc[0][rank_col]))
+            return {
+                "id": "epi",
+                "latestYear": 2026,
+                "indiaRank": rank,
+                "total": 180,
+                "source": "https://epi.yale.edu/",
+                "sourceFile": url,
+                "releaseStatus": "released",
+            }
+    raise ValueError("India EPI rank not found in official XLSX")
 
 
 def world_bank_rows(payload):
