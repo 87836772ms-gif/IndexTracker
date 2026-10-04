@@ -9,13 +9,36 @@ let activeSearch = '';
 let trendChart = null;
 let currentTheme = localStorage.getItem('theme') || 'light';
 let localIndexes = []; // user-added indexes from localStorage
+let liveIndexes = [];
+let liveDataLoaded = false;
 
 // ── INIT ──
-document.addEventListener('DOMContentLoaded', () => {
-  initSplash();
+document.addEventListener('DOMContentLoaded', async () => {
   loadLocalIndexes();
   applyTheme(currentTheme);
+  await loadLiveIndexes();
+  initSplash();
 });
+
+async function loadLiveIndexes() {
+  try {
+    const res = await fetch('js/live-data.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('Live data unavailable');
+    const payload = await res.json();
+    liveIndexes = payload.autoUpdatedIndexes || {};
+    liveDataLoaded = true;
+  } catch (e) {
+    liveIndexes = {};
+    liveDataLoaded = false;
+  }
+}
+
+function mergeLiveData(index) {
+  const live = Array.isArray(liveIndexes)
+    ? liveIndexes.find(item => item.id === index.id)
+    : liveIndexes[index.id];
+  return live ? { ...index, ...live } : index;
+}
 
 // ══════════ SPLASH LOADER ══════════
 function initSplash() {
@@ -54,7 +77,7 @@ function renderAll() {
 }
 
 function getAllIndexes() {
-  return [...INDEXES, ...localIndexes];
+  return [...INDEXES, ...localIndexes].map(mergeLiveData);
 }
 
 // ══════════ INDIA HERO STATS ══════════
@@ -110,6 +133,14 @@ function createCard(idx) {
 
   const trendBadgeClass = idx.trend === 'up' ? 'trend-up-badge' : idx.trend === 'down' ? 'trend-down-badge' : 'trend-same-badge';
   const trendText = idx.trend === 'up' ? '📈 Improved' : idx.trend === 'down' ? '📉 Declined' : '➡️ Stable';
+  const currentYear = new Date().getFullYear();
+  const latestYear = idx.latestYear || (idx.history?.length ? Math.max(...idx.history.map(h => h.year)) : null);
+  const yearStatus = latestYear
+    ? 'Latest available: ' + latestYear + (latestYear < currentYear ? ' • ' + currentYear + ' data not released yet' : '')
+    : 'Latest release year unavailable';
+  const rankRatio = idx.total ? idx.indiaRank / idx.total : 1;
+  const rankColor = rankRatio <= 0.33 ? '#16a34a' : rankRatio <= 0.66 ? '#d97706' : '#dc2626';
+
   const categoryLabel = {
     economy: '💰 Economy', human: '👤 Human Dev',
     governance: '🏛️ Governance', environment: '🌱 Environment',
@@ -117,7 +148,7 @@ function createCard(idx) {
   }[idx.category] || idx.category;
 
   return `
-    <div class="index-card" style="--card-color:${idx.color}" onclick="openDetailModal('${idx.id}')">
+    <div class="index-card" style="--card-color:${idx.color};border-left:3px solid ${rankColor}" onclick="openDetailModal('${idx.id}')">
       <div class="card-top">
         <span class="card-emoji">${idx.emoji}</span>
         <span class="card-category">${categoryLabel}</span>
@@ -127,7 +158,8 @@ function createCard(idx) {
       <div class="card-rank-row">
         <div>
           <div class="india-rank-label">🇮🇳 India</div>
-          <div class="india-rank-num">#${idx.indiaRank}</div>
+          <div class="india-rank-num" style="color:${rankColor}">#${idx.indiaRank}</div>
+          <div style="font-size:.72rem;color:var(--text2);margin-top:4px">${yearStatus}</div>
           <div class="india-rank-out">of ${idx.total}</div>
         </div>
         <div class="rank-progress">
@@ -175,7 +207,12 @@ function openDetailModal(id) {
   document.getElementById('modalIndiaRank').textContent = `#${idx.indiaRank}`;
   document.getElementById('modalOutOf').textContent = `out of ${idx.total} countries`;
   document.getElementById('modalTop').textContent = `${idx.topCountry || '—'}`;
-  document.getElementById('modalDesc').textContent = idx.desc || '';
+  const currentYear = new Date().getFullYear();
+  const latestYear = idx.latestYear || (idx.history?.length ? Math.max(...idx.history.map(h => h.year)) : null);
+  const status = latestYear && latestYear < currentYear
+    ? ' Latest available report: ' + latestYear + '. ' + currentYear + ' data has not been released yet.'
+    : latestYear ? ' Latest available report: ' + latestYear + '.' : '';
+  document.getElementById('modalDesc').textContent = (idx.desc || '') + status;
   document.getElementById('modalSource').href = idx.source || '#';
 
   // Trend badge
@@ -343,7 +380,7 @@ function loadLocalIndexes() {
 function updateLastUpdated() {
   const el = document.getElementById('lastUpdated');
   const now = new Date();
-  el.textContent = `Data last verified: ${now.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })} • Source data from 2023–24 reports`;
+  el.textContent = liveDataLoaded ? `Data last verified: ${now.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })} • Automatic official-source refresh enabled` : `Data last verified: ${now.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })} • Using stored fallback data`;
 }
 
 // ══════════ TOAST ══════════
