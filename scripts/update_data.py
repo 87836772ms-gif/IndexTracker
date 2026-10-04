@@ -146,6 +146,23 @@ def latest_happiness():
     }
 
 
+def latest_epi():
+    url = "https://epi.yale.edu/2026/results/country/IND"
+    html = get(url).text.replace("\n", " ")
+    m = re.search(r"Environmental Performance Index\\s*\\|\\s*(\\d+)\\s*\\|\\s*([0-9.]+)", html, re.I)
+    if not m:
+        raise ValueError("India EPI result not found")
+    return {
+        "id": "epi",
+        "latestYear": 2026,
+        "indiaRank": int(m.group(1)),
+        "total": 177,
+        "source": "https://epi.yale.edu/",
+        "sourceFile": url,
+        "releaseStatus": "released",
+    }
+
+
 def latest_imf_gdp():
     page = "https://data.imf.org/Datasets/WEO"
     urls = links(page, r"\.xlsx$")
@@ -196,7 +213,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
