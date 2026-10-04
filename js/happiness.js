@@ -61,17 +61,26 @@ function renderRankings(year = "2026"){
   const rows = RANKINGS[year] || [];
   const india = INDIA_DATA.find(x => x.year === String(year));
 
-  let data = rows.map((item,index) => ({
-    rank: item[2] ?? (index + 1),
-    country: item[0],
-    score: item[1]
-  }));
+  let data = rows
+    .filter(item => item[2] <= 10)
+    .map(item => ({
+      rank: item[2],
+      country: item[0],
+      score: item[1]
+    }));
 
-  if(!data.some(x => x.country === "India") && india){
-    data.push({rank:india.rank,country:"India",score:india.score});
+  if(query){
+    data = rows
+      .filter(item => item[0].toLowerCase().includes(query))
+      .map(item => ({
+        rank: item[2],
+        country: item[0],
+        score: item[1]
+      }));
+    if(!data.length && india && "india".includes(query)){
+      data = [{rank: india.rank, country:"India", score:india.score}];
+    }
   }
-
-  data = data.filter(x => x.country.toLowerCase().includes(query));
   data.sort((a,b) => a.rank - b.rank);
 
   body.innerHTML = data.map(row => {
