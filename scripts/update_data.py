@@ -405,6 +405,7 @@ def latest_wgi():
 
 
 def latest_imf_gdp():
+    # IMF April 2026 WEO is the latest full WEO release currently available.
     page = "https://data.imf.org/Datasets/WEO"
     urls = links(page, r"\.xlsx$")
     candidates = [u for u in urls if "WEO" in u.upper()]
@@ -416,19 +417,21 @@ def latest_imf_gdp():
     sheet = next((s for s in xls.sheet_names if "country" in s.lower()), xls.sheet_names[0])
     df = pd.read_excel(BytesIO(raw), sheet_name=sheet)
 
-    # IMF WEO Excel normally has columns Country, ISO, and PPPGDP_YYYY.
+    # WEO datasets may use a column named "ISO" or "ISO3".
     iso_col = next((c for c in df.columns if str(c).strip().lower() in {"iso", "iso3", "iso code"}), None)
     if iso_col is None:
         raise ValueError("IMF ISO column not found")
 
+    # PPP GDP series is named PPPGDP_YYYY in WEO Excel.
     year_cols = []
-    for c in df.columns:
-        m = re.search(r"PPPGDP[_ ]?(20\d{2})", str(c))
+    for col in df.columns:
+        m = re.search(r"PPPGDP[_ ]?(20\d{2})", str(col))
         if m:
-            year_cols.append((int(m.group(1)), c))
+            year_cols.append((int(m.group(1)), col))
     if not year_cols:
         raise ValueError("IMF PPPGDP year column not found")
 
+    # Use the latest year actually present in the official WEO dataset.
     year, col = max(year_cols)
     work = df[[iso_col, col]].copy()
     work[col] = pd.to_numeric(work[col], errors="coerce")
@@ -447,8 +450,8 @@ def latest_imf_gdp():
         "total": int(len(work)),
         "source": "https://www.imf.org/en/Publications/WEO",
         "sourceFile": candidates[0],
+        "releaseStatus": "released",
     }
-
 
 def main():
     overrides = {}
