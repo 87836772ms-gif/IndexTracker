@@ -422,6 +422,21 @@ def latest_imf_gdp():
     if iso_col is None:
         raise ValueError("IMF ISO column not found")
 
+    # IMF WEO also publishes nominal GDP as NGDP_YYYY. Update both GDP cards from the same official vintage.
+    nominal_cols = [(int(m.group(1)), col) for col in df.columns for m in [re.search(r"NGDP[_ ]?(20\\d{2})", str(col))] if m]
+    if nominal_cols:
+        n_year, n_col = max(nominal_cols)
+        n_work = df[[iso_col, n_col]].copy()
+        n_work[n_col] = pd.to_numeric(n_work[n_col], errors="coerce")
+        n_work = n_work.dropna(subset=[n_col]).sort_values(n_col, ascending=False).reset_index(drop=True)
+        n_india = n_work[n_work[iso_col].astype(str).str.upper().eq("IND")]
+        if not n_india.empty:
+            nominal_result = {"id":"gdp-nominal","latestYear":n_year,"indiaRank":int(n_india.index[0])+1,"total":int(len(n_work)),"source":"https://www.imf.org/en/Publications/WEO","sourceFile":candidates[0],"releaseStatus":"released"}
+        else:
+            nominal_result = None
+    else:
+        nominal_result = None
+
     # PPP GDP series is named PPPGDP_YYYY in WEO Excel.
     year_cols = []
     for col in df.columns:
@@ -443,7 +458,7 @@ def latest_imf_gdp():
         raise ValueError("India not found in IMF WEO data")
 
     rank = int(india.index[0]) + 1
-    return {
+    ppp_result = {
         "id": "gdp-ppp",
         "latestYear": year,
         "indiaRank": rank,
@@ -457,7 +472,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_wgi, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_world_bank_human, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_wgi, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
