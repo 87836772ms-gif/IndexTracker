@@ -361,6 +361,9 @@ def latest_democracy_eiu():
 def latest_democracy_eiu_official():
     return {"id":"democracy","latestYear":2025,"indiaRank":104,"total":167,"source":"https://www.eiu.com/n/global-themes/democracy-index-2025-hub/","sourceFile":"https://www.eiu.com/n/global-themes/democracy-index-2025-hub/","releaseStatus":"released"}
 
+def latest_rule_of_law_wjp_official():
+    return {"id":"rule-law","latestYear":2025,"indiaRank":86,"total":143,"source":"https://worldjusticeproject.org/rule-of-law-index/","sourceFile":"https://worldjusticeproject.org/rule-of-law-index/","releaseStatus":"released"}
+
 def latest_rule_of_law_wjp():
     url = "https://worldjusticeproject.org/rule-of-law-index/downloads/WJPIndex2025.pdf"
     pdf = get(url).content
@@ -544,7 +547,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness_official, latest_epi, latest_world_bank_human, latest_technology_wipo, latest_gender_gap_wef, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi_official, latest_democracy_eiu_official, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_cpi_ti, latest_wgi, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness_official, latest_epi, latest_world_bank_human, latest_technology_wipo, latest_gender_gap_wef, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi_official, latest_democracy_eiu_official, latest_rule_of_law_wjp_official, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_cpi_ti, latest_wgi, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
