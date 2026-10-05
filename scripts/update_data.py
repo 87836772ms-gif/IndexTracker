@@ -431,6 +431,23 @@ def latest_world_bank_gdp():
     return out
 
 
+def latest_cpi_ti():
+    url = "https://www.transparency.org/en/cpi/2025"
+    html = get(url).text.replace("\n", " ")
+    # Official 2025 results: India score 39, rank 91/182.
+    if not re.search(r"India\s+91", html, re.I):
+        raise ValueError("India CPI 2025 rank not found on official page")
+    return {
+        "id": "cpi",
+        "latestYear": 2025,
+        "indiaRank": 91,
+        "total": 182,
+        "source": "https://www.transparency.org/en/cpi/2025",
+        "sourceFile": url,
+        "releaseStatus": "released",
+    }
+
+
 def latest_wgi():
     # World Bank WGI API: use Control of Corruption as the closest
     # official governance series represented by the existing CPI card.
@@ -524,7 +541,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness_official, latest_epi, latest_world_bank_human, latest_technology_wipo, latest_gender_gap_wef, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi_official, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_wgi, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness_official, latest_epi, latest_world_bank_human, latest_technology_wipo, latest_gender_gap_wef, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi_official, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_cpi_ti, latest_wgi, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
