@@ -221,6 +221,23 @@ def latest_technology_wipo():
     }
 
 
+def latest_gender_gap_wef():
+    url = "https://www.weforum.org/publications/global-gender-gap-report-2026/in-full/benchmarking-gender-gaps-2026/"
+    html = get(url).text.replace("\n", " ")
+    m = re.search(r"India.*?retains the 131st position", html, re.I | re.S)
+    if not m:
+        raise ValueError("India Gender Gap 2026 rank not found")
+    return {
+        "id": "gender-gap",
+        "latestYear": 2026,
+        "indiaRank": 131,
+        "total": 145,
+        "source": "https://www.weforum.org/publications/global-gender-gap-report-2026/",
+        "sourceFile": url,
+        "releaseStatus": "released",
+    }
+
+
 def latest_global_indexes():
     # Safe automatic adapters for major indexes with stable public official data.
     # Other indexes remain on their stored snapshot until an official adapter
@@ -472,7 +489,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_world_bank_human, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_wgi, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_world_bank_human, latest_technology_wipo, latest_gender_gap_wef, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_wgi, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
