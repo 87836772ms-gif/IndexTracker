@@ -159,9 +159,13 @@ def latest_epi():
 
 
 def world_bank_rows(payload):
-    if not isinstance(payload, list) or len(payload) < 2 or not isinstance(payload[1], list):
+    if isinstance(payload, list) and len(payload) >= 2 and isinstance(payload[1], list):
+        rows = payload[1]
+    elif isinstance(payload, dict) and isinstance(payload.get("data"), list):
+        rows = payload["data"]
+    else:
         raise ValueError("Unexpected World Bank API response")
-    return [r for r in payload[1] if isinstance(r, dict) and r.get("value") is not None and r.get("countryiso3code")]
+    return [r for r in rows if isinstance(r, dict) and r.get("value") is not None and r.get("countryiso3code")]
 
 
 def latest_world_bank_human():
@@ -229,7 +233,7 @@ def latest_global_indexes():
         html = get(url).text
         # Keep this adapter intentionally conservative; if the official page
         # format changes, it fails safely instead of writing guessed rankings.
-        m = re.search(r"Gender Inequality Index.*?India.*?(?:rank|Rank)[^0-9]{0,30}(\\d+)", html, re.I | re.S)
+        m = re.search(r"Gender Inequality Index.*?India.*?(?:rank|Rank)[^0-9]{0,30}(\d+)", html, re.I | re.S)
         if m:
             out.append({
                 "id": "gender-gap",
@@ -262,7 +266,7 @@ def latest_itu_cyber():
 def latest_rsf_press():
     url = "https://rsf.org/en/country/india"
     html = get(url).text.replace("\n", " ")
-    m = re.search(r"Index 2026.*?(\\d+)\\s*/\\s*180", html, re.I | re.S)
+    m = re.search(r"Index 2026.*?(\d+)\s*/\s*180", html, re.I | re.S)
     if not m:
         raise ValueError("RSF India 2026 rank not found")
     return {
@@ -279,7 +283,7 @@ def latest_rsf_press():
 def latest_ghi():
     url = "https://www.globalhungerindex.org/india.html"
     html = get(url).text.replace("\n", " ")
-    m = re.search(r"2025 GHI.*?ranked\\s+(\\d+)(?:st|nd|rd|th)\\s+out\\s+of\\s+(\\d+)\\s+countries", html, re.I | re.S)
+    m = re.search(r"2025 GHI.*?ranked\s+(\d+)(?:st|nd|rd|th)\s+out\s+of\s+(\d+)\s+countries", html, re.I | re.S)
     if not m:
         raise ValueError("India GHI 2025 rank not found")
     return {
@@ -296,7 +300,7 @@ def latest_ghi():
 def latest_democracy_eiu():
     url = "https://www.eiu.com/n/global-themes/democracy-index-2025-hub/"
     html = get(url).text.replace("\n", " ")
-    m = re.search(r"India.*?2025.*?(\\d+)(?:st|nd|rd|th)", html, re.I | re.S)
+    m = re.search(r"India.*?2025.*?(\d+)(?:st|nd|rd|th)", html, re.I | re.S)
     if not m:
         raise ValueError("India Democracy Index rank not found")
     return {"id":"democracy","latestYear":2025,"indiaRank":int(m.group(1)),"total":167,"source":"https://www.eiu.com/","sourceFile":url,"releaseStatus":"released"}
@@ -307,7 +311,7 @@ def latest_rule_of_law_wjp():
     pdf = get(url).content
     # The PDF is parsed by a lightweight text endpoint when available.
     text_blob = get("https://worldjusticeproject.org/rule-of-law-index/downloads/WJPIndex2025.pdf").text
-    m = re.search(r"India.*?Global Rank.*?(\\d+)\\s*/\\s*(143)", text_blob, re.I | re.S)
+    m = re.search(r"India.*?Global Rank.*?(\d+)\s*/\s*(143)", text_blob, re.I | re.S)
     if not m:
         raise ValueError("India Rule of Law 2025 rank not found")
     return {"id":"rule-of-law","latestYear":2025,"indiaRank":int(m.group(1)),"total":143,"source":"https://worldjusticeproject.org/","sourceFile":url,"releaseStatus":"released"}
@@ -316,7 +320,7 @@ def latest_rule_of_law_wjp():
 def latest_itu_ict():
     url = "https://www.itu.int/itu-d/reports/statistics/idi2024/"
     html = get(url).text.replace("\n", " ")
-    m = re.search(r"India.*?rank[^0-9]{0,30}(\\d+)", html, re.I | re.S)
+    m = re.search(r"India.*?rank[^0-9]{0,30}(\d+)", html, re.I | re.S)
     if not m:
         raise ValueError("India ICT Development Index rank not found")
     return {"id":"ict","latestYear":2024,"indiaRank":int(m.group(1)),"total":170,"source":"https://www.itu.int/itu-d/reports/statistics/idi2024/","sourceFile":url,"releaseStatus":"released"}
@@ -331,7 +335,7 @@ def latest_trade_snapshot():
 def latest_network_readiness():
     url = "https://www.networkreadinessindex.org/"
     html = get(url).text.replace("\n", " ")
-    m = re.search(r"India.*?rank[^0-9]{0,30}(\\d+)", html, re.I | re.S)
+    m = re.search(r"India.*?rank[^0-9]{0,30}(\d+)", html, re.I | re.S)
     if not m:
         raise ValueError("India Network Readiness rank not found")
     return {"id":"network-readiness","latestYear":2025,"indiaRank":int(m.group(1)),"total":127,"source":url,"sourceFile":url,"releaseStatus":"released"}
@@ -450,7 +454,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness):
+    for fn in (latest_hdi, latest_happiness, latest_epi, latest_world_bank_human, latest_world_bank_gdp, latest_technology_wipo, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_wgi, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
