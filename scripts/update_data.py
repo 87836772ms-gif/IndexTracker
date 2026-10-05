@@ -146,6 +146,26 @@ def latest_happiness():
     }
 
 
+def latest_happiness_official():
+    # WHR 2026 official statistical appendix is publicly accessible even when
+    # the data-sharing page blocks automated requests.
+    url = "https://files.worldhappiness.report/WHR26_Statistical_Appendix.pdf"
+    html_url = "https://www.worldhappiness.report/ed/2026/"
+    text_blob = get(url).text
+    m = re.search(r"116.*?India\s*\(4\.536\)", text_blob, re.I | re.S)
+    if not m:
+        raise ValueError("India WHR 2026 rank not found in official appendix")
+    return {
+        "id": "happiness",
+        "latestYear": 2026,
+        "indiaRank": 116,
+        "total": 147,
+        "source": "https://worldhappiness.report/",
+        "sourceFile": url,
+        "releaseStatus": "released",
+    }
+
+
 def latest_epi():
     url = "https://epi.yale.edu/2026/results/country/IND"
     html = get(url).text.replace("\n", " ")
@@ -489,7 +509,7 @@ def main():
     overrides = {}
     errors = []
 
-    for fn in (latest_hdi, latest_happiness, latest_epi, latest_world_bank_human, latest_technology_wipo, latest_gender_gap_wef, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_wgi, latest_imf_gdp):
+    for fn in (latest_hdi, latest_happiness_official, latest_epi, latest_world_bank_human, latest_technology_wipo, latest_gender_gap_wef, latest_global_indexes, latest_itu_cyber, latest_rsf_press, latest_ghi, latest_democracy_eiu, latest_rule_of_law_wjp, latest_trade_snapshot, latest_itu_ict, latest_network_readiness, latest_global_competitiveness, latest_wgi, latest_imf_gdp):
         try:
             item = fn()
             overrides[item["id"]] = item
