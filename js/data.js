@@ -12,7 +12,8 @@ const INDEXES = [
     org: "International Monetary Fund (IMF)",
     category: "economy",
     indiaRank: 3,
-    total: 195,
+    total: 197,
+    latestYear: 2026,
     topCountry: "China",
     trend: "up",
     color: "#f59e0b",
@@ -20,7 +21,7 @@ const INDEXES = [
     source: "https://www.imf.org/en/Publications/WEO",
     history: [
       { year: 2020, rank: 6 }, { year: 2021, rank: 5 },
-      { year: 2022, rank: 4 }, { year: 2023, rank: 3 }, { year: 2024, rank: 3 }
+      { year: 2022, rank: 4 }, { year: 2023, rank: 3 }, { year: 2024, rank: 3 }, { year: 2026, rank: 3 }
     ]
   },
   {
@@ -29,8 +30,9 @@ const INDEXES = [
     emoji: "🏦",
     org: "World Bank / IMF",
     category: "economy",
-    indiaRank: 5,
-    total: 195,
+    indiaRank: 6,
+    total: 197,
+    latestYear: 2026,
     topCountry: "USA",
     trend: "up",
     color: "#f59e0b",
@@ -38,7 +40,7 @@ const INDEXES = [
     source: "https://data.worldbank.org/",
     history: [
       { year: 2020, rank: 6 }, { year: 2021, rank: 6 },
-      { year: 2022, rank: 5 }, { year: 2023, rank: 5 }, { year: 2024, rank: 5 }
+      { year: 2022, rank: 5 }, { year: 2023, rank: 5 }, { year: 2024, rank: 5 }, { year: 2026, rank: 6 }
     ]
   },
   {
